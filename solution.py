@@ -24,7 +24,13 @@ square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', 
 # square_units[0] = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']
 # This is the top left square.
 
-unitlist = row_units + col_units + square_units;
+#diagonal_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
+diagonal_units = [[''.join(s) for s in zip(rows, cols)], [''.join(s) for s in zip(rows, cols[::-1])]]
+# Element example:
+# diagonal_units[0] = ['A1','B2','C3','D4','E5','F6','G7','H8','I9']
+# This is the top left o bottom right constraint unit
+
+unitlist = row_units + col_units + square_units + diagonal_units;
 
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
@@ -254,6 +260,9 @@ def solve(grid):
     return result
 
 if __name__ == '__main__':
+
+    print('diag:', diagonal_units)
+
     # grid2 = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
     # display(solve(grid2))
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
