@@ -26,6 +26,7 @@ square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', 
 
 #diagonal_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['A9','B8','C7','D6','E5','F4','G3','H2','I1']]
 diagonal_units = [[''.join(s) for s in zip(rows, cols)], [''.join(s) for s in zip(rows, cols[::-1])]]
+
 # Element example:
 # diagonal_units[0] = ['A1','B2','C3','D4','E5','F6','G7','H8','I9']
 # This is the top left o bottom right constraint unit
@@ -101,6 +102,10 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
+    if not values:
+        print('This puzzle cannot be solved with the diagonal constraint rule')
+        return
+
     width = 1+max(len(values[s]) for s in boxes)
     line = '+'.join(['-'*(width*3)*3])
     for r in rows:
@@ -125,8 +130,9 @@ def eliminate(values):
             to_eliminate = values[box]
             # eliminate the value from all peers
             for peer in peers[box]:
-                new_value = values[peer].replace(to_eliminate, '')
-                assign_value(values, peer, new_value)
+                if to_eliminate in values[peer]:
+                    new_value = values[peer].replace(to_eliminate, '')
+                    assign_value(values, peer, new_value)
 
     return values
 
@@ -183,14 +189,18 @@ def reduce_puzzle(values):
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
-        # Your code here: Use the Eliminate Strategy
+        # Use the Eliminate Strategy
         values = eliminate(values)
 
         # check if puzzle is solved
         if is_solved(values): return values
 
-        # Your code here: Use the Only Choice Strategy
+        # Use the Only Choice Strategy
         values = only_choice(values)
+        if is_solved(values): return values
+
+        # Use the Naked Twins Strategy
+        values = naked_twins(values)
         if is_solved(values): return values
 
         # Check how many boxes have a determined value, to compare
@@ -223,16 +233,17 @@ def search(values):
         return values # we're done
 
     # Choose one of the unfilled squares with the fewest possibilities
-    list_of_keys = []
+    list_of_squares = []
     min_possibility = 2
-    while list_of_keys == []:
-        list_of_keys = [box for box in values.keys() if len(values[box]) == min_possibility]
+    while not list_of_squares:
+        list_of_squares = [box for box in values.keys() if len(values[box]) == min_possibility]
         min_possibility +=1
 
 
-    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
-
-    for key in list_of_keys:
+    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False),
+    # return that answer!
+    # although we iterate over the list_of_keys, the solution should be reached using the first square values
+    for key in list_of_squares:
         for digit in values[key]:
             # make a copy for search trials.
             possible_solution = {k:v for k, v in values.items()}
@@ -256,17 +267,21 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    result = search(grid_values(grid))
-    return result
+    return search(grid_values(grid))
 
 if __name__ == '__main__':
 
-    print('diag:', diagonal_units)
+    # FYI... the following grid_simple cannont be solved with the diagonal rule.
+    #grid_simple = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
+    #display(solve(grid_simple))
 
-    # grid2 = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
-    # display(solve(grid2))
+    # the following is from Peter's article on Sudoku http://norvig.com/sudoku.html
+    #norvig_hard  = '.....6....59.....82....8....45........3........6..3.54...325..6..................'
+    #display(solve(norvig_hard))
+
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
+    print('assignments:', len(assignments))
 
     try:
         from visualize import visualize_assignments

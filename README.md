@@ -3,11 +3,20 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: We examine each unit for any two boxes with the same pair of digits, this will 
+   form the constraint rule on all other boxes of the unit, so we iterate over the unit 
+   and eliminate any of the pairs' digits from the box if exist. 
+   We added such strategy to the other strategies in reduce_puzzle() and by iterating over
+   all strategies we reduce the search space until we reach a solution or no further 
+   change to the puzzle state.
+
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: The diagonal sudoku enforce a new rule of having the numbers 1 to 9 appear only once in each diagonal boxes.
+   This rule is applied by considering each diagonal as a unit ('diagonal_units' in the code) to be examined and 
+   enforced while we solve the puzzle using the constraint startegies.
+
 
 ### Install
 
