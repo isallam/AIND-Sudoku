@@ -4,7 +4,7 @@
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
 A: We examine each unit for any two boxes with the same pair of digits, this will 
-   form the constraint rule on all other boxes of the unit, so we iterate over the unit 
+   form the constraint rule on all other boxes within the unit, so we iterate over the unit 
    and eliminate any of the pairs' digits from the box if exist. 
    We added such strategy to the other strategies in reduce_puzzle() and by iterating over
    all strategies we reduce the search space until we reach a solution or no further 
